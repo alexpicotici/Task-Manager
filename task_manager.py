@@ -347,6 +347,51 @@ def view_mine():
         print("\nYou have not been assigned a task yet.")
 
 
+# Function that generates text reports:
+def generate_reports(task_list):
+    
+    # Getting the number of tasks registered.
+    number_of_tasks = len(task_list)
+    
+    # Getting the number of completed and uncompleted tasks.
+    completed_tasks = []
+    uncompleted_tasks = []
+    for task in task_list:
+        if task['completed'] == True:
+            completed_tasks.append(task)
+        elif task['completed'] == False:
+            uncompleted_tasks.append(task)
+        
+    number_of_completed_tasks = len(completed_tasks)
+    number_of_uncompleted_tasks = len(uncompleted_tasks)
+
+    # Getting the number of overdue tasks.
+    overdue_tasks = []
+
+    # Getting the string and integer value of today's date.
+    current_date = datetime.now()
+    for task in task_list:
+        if task['due_date'] < current_date and task['completed'] == False:
+            overdue_tasks.append(task)
+
+    number_of_overdue_tasks = len(overdue_tasks)    
+
+    # Getting the percentage of incomplete tasks.
+    percentage_of_uncompleted_tasks = (number_of_uncompleted_tasks/number_of_tasks) * 100
+
+    # Getting the percentage of complete tasks.
+    percentage_of_completed_tasks = (number_of_completed_tasks/number_of_tasks) * 100
+
+    # Writing the data into a text file.
+    with open("task_overview.txt", "w") as task_file:
+        task_file.write(f"""\nTasks registered: {number_of_tasks}
+Completed tasks: {number_of_completed_tasks}
+Incomplete tasks: {number_of_uncompleted_tasks}\nOverdue tasks: {number_of_overdue_tasks}
+Completed tasks percentage: {percentage_of_completed_tasks}%
+Incomplete tasks percentage: {percentage_of_uncompleted_tasks}%
+""")
+    print("\nReports have been generated to your directory!")
+
 
 #====Main Body Of Code=====
 while True:
@@ -354,10 +399,11 @@ while True:
     # making sure that the user input is converted to lower case.
     print()
     menu = input('''Select one of the following Options below:
-r - Registering a user
-a - Adding a task
+r - Register a user
+a - Add a task
 va - View all tasks
 vm - View my task
+gr - Generate reports
 ds - Display statistics
 e - Exit
 : ''').lower()
@@ -373,6 +419,9 @@ e - Exit
 
     elif menu == 'vm':
         view_mine()
+
+    elif menu == 'gr':
+        generate_reports(task_list)
                 
     elif menu == 'ds' and curr_user == 'admin': 
         '''If the user is an admin they can display statistics about number of users

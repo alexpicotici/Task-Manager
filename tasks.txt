@@ -1,0 +1,4 @@
+alex;Finish task 17;Implement the final requirements for the completion of the task;2024-03-24;2024-03-20;Yes
+admin;test a function;play around and make sure that the program works perfectly;2024-03-21;2024-03-21;Yes
+alex;Learn how to use date library in Python;Effectively come to a good understanding of how the date library can be used in Python;2024-06-30;2024-03-21;No
+alin;Cook food;Make delicious food;2024-03-31;2024-03-31;Yes

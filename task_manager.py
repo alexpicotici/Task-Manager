@@ -76,7 +76,7 @@ while not logged_in:
 #====Defining functions====
         
 # Function that adds a new user to the user.txt file:
-def reg_user():
+def reg_user(username_password):
         
     while True:
         new_username = input("New Username: ")
@@ -110,7 +110,7 @@ Please choose a different username""")
 
 
 # Function that adds a new task to the user.txt file:
-def add_task():
+def add_task(username_password, task_list):
 
     while True:
         '''Allow a user to add a new task to task.txt file
@@ -299,7 +299,7 @@ d - change the due date of the task
         
 
 # Function that displays all registered tasks:
-def view_all():
+def view_all(task_list):
       
     '''Reads the task from task.txt file and prints to the console in the 
     format of Output 2 presented in the task pdf (i.e. includes spacing
@@ -320,7 +320,7 @@ def view_all():
 
 
 # Function that displays the tasks assignes to the current user:
-def view_mine():
+def view_mine(task_list):
     '''Reads the task from task.txt file and prints to the console in the 
     format of Output 2 presented in the task pdf (i.e. includes spacing
     and labelling)
@@ -348,8 +348,10 @@ def view_mine():
 
 
 # Function that generates text reports:
-def generate_reports(task_list):
+def generate_reports(task_list, username_password):
     
+    # Report #1 Task Overview
+
     # Getting the number of tasks registered.
     number_of_tasks = len(task_list)
     
@@ -371,7 +373,7 @@ def generate_reports(task_list):
     # Getting the string and integer value of today's date.
     current_date = datetime.now()
     for task in task_list:
-        if task['due_date'] < current_date and task['completed'] == False:
+        if task['due_date'] < current_date and task['completed'] is False:
             overdue_tasks.append(task)
 
     number_of_overdue_tasks = len(overdue_tasks)    
@@ -390,7 +392,93 @@ Incomplete tasks: {number_of_uncompleted_tasks}\nOverdue tasks: {number_of_overd
 Completed tasks percentage: {percentage_of_completed_tasks}%
 Incomplete tasks percentage: {percentage_of_uncompleted_tasks}%
 """)
+    
+    # Report #2 User Overview
+
+    # Getting the number of users.
+    number_of_users = len(username_password)
+
+    # Getting the number of tasks registered.
+    number_of_tasks = len(task_list)
+
+    # Statistics for each user.
+    usernames = []
+
+    for user in username_password:
+        usernames.append(user)
+    
+    user_tasks = {}
+    for user in usernames:
+        user_tasks[user] = []
+        for task in task_list:
+            if task['username'] == user:
+                user_tasks[user].append(task) 
+    
+    # This is where all the data to be written is stored.
+    all_users_tasks = ""
+
+    # Getting all the information from the dictionary.
+    for user, num in user_tasks.items():
+        all_users_tasks += f"\nUser {user} tasks assigned: {len(num)}"
+        user_task_percentage = (len(num)/number_of_tasks) * 100
+        all_users_tasks += f"""\n{user_task_percentage}% of total tasks assigned to this user"""
+        comp_tasks = []
+        uncomp_tasks = []
+        for d in num:
+            if d['completed'] == True:
+                comp_tasks.append(d)
+            elif d['completed'] == False:
+                uncomp_tasks.append(d)
+        completed_percentage = (len(comp_tasks)/len(num)) * 100
+        all_users_tasks += f"""\n{completed_percentage}% of this user's tasks are completed"""
+        uncompleted_percentage = (len(uncomp_tasks)/len(num)) * 100
+        all_users_tasks += f"""\n{uncompleted_percentage}% of this user's tasks are not completed"""
+        current_date = datetime.now()
+        over_tasks = []
+        for d in num:
+            if d['due_date'] < current_date and d['completed'] is False:
+                over_tasks.append(d)
+        overdue_uncomp_percentage = (len(over_tasks)/len(num)) * 100
+        all_users_tasks += f"""\n{overdue_uncomp_percentage}% of this user's tasks are incompleted and are overdue\n"""
+
+    # Writing the user data into a text file.
+    with open("user_overview.txt", "w") as user_file:
+        user_file.write(all_users_tasks)
+  
     print("\nReports have been generated to your directory!")
+
+
+# This function displays statistics from text file logs:
+def display_statistics():    
+
+    num_users = len(username_password.keys())
+    num_tasks = len(task_list)
+    print("\n========== STATISTICS =============")
+
+    # Reading from the user.txt file.
+    with open('user.txt', 'r') as us_file:
+        print("\n-----------------------------------")
+        print(f"Number of users: \t {num_users}")
+        display_us = "\nList of usernames and passwords:\n"
+        for x in us_file:
+            display_us += x
+        print(display_us)
+        print("-----------------------------------\n")
+    
+    # Reading from the task.txt file.
+    with open('tasks.txt', 'r') as ta_file:
+        print("\n-----------------------------------")
+        print(f"Number of tasks: \t {num_tasks}")
+        for count, x in enumerate(ta_file, 1):
+            line = x.split(';')
+            print(f"""\nTask {count}:
+Assigned to: {line[0]}
+Task title: {line[1]}
+Task description: {line[2]}
+Task due date: {line[3]}
+Task assigned date: {line[4]}
+Task completed? {line[5]}
+""")
 
 
 #====Main Body Of Code=====
@@ -409,31 +497,23 @@ e - Exit
 : ''').lower()
 
     if menu == 'r':
-        reg_user()
+        reg_user(username_password)
 
     elif menu == 'a':
-        add_task()
+        add_task(username_password, task_list)
 
     elif menu == 'va':
-        view_all()
+        view_all(task_list)
 
     elif menu == 'vm':
-        view_mine()
+        view_mine(task_list)
 
     elif menu == 'gr':
-        generate_reports(task_list)
+        generate_reports(task_list, username_password)
                 
     elif menu == 'ds' and curr_user == 'admin': 
-        '''If the user is an admin they can display statistics about number of users
-            and tasks.'''
-        num_users = len(username_password.keys())
-        num_tasks = len(task_list)
-
-        print("-----------------------------------")
-        print(f"Number of users: \t\t {num_users}")
-        print(f"Number of tasks: \t\t {num_tasks}")
-        print("-----------------------------------")    
-
+        display_statistics()
+ 
     elif menu == 'e':
         print('Goodbye!!!')
         exit()

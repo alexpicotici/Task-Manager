@@ -381,16 +381,16 @@ def generate_reports(task_list, username_password):
     # Getting the percentage of incomplete tasks.
     percentage_of_uncompleted_tasks = (number_of_uncompleted_tasks/number_of_tasks) * 100
 
-    # Getting the percentage of complete tasks.
-    percentage_of_completed_tasks = (number_of_completed_tasks/number_of_tasks) * 100
+    # Getting the percentage of overdue, incomplete tasks.
+    percentage_of_overdue_tasks = (number_of_overdue_tasks/number_of_tasks) * 100
 
     # Writing the data into a text file.
     with open("task_overview.txt", "w") as task_file:
         task_file.write(f"""\nTasks registered: {number_of_tasks}
 Completed tasks: {number_of_completed_tasks}
 Incomplete tasks: {number_of_uncompleted_tasks}\nOverdue tasks: {number_of_overdue_tasks}
-Completed tasks percentage: {percentage_of_completed_tasks}%
 Incomplete tasks percentage: {percentage_of_uncompleted_tasks}%
+Overdue, incomplete tasks percentage: {percentage_of_overdue_tasks}%
 """)
     
     # Report #2 User Overview
@@ -415,7 +415,8 @@ Incomplete tasks percentage: {percentage_of_uncompleted_tasks}%
                 user_tasks[user].append(task) 
     
     # This is where all the data to be written is stored.
-    all_users_tasks = ""
+    all_users_tasks = f"""Number of users: {number_of_users}
+Tasks registered: {number_of_tasks}\n"""
 
     # Getting all the information from the dictionary.
     for user, num in user_tasks.items():

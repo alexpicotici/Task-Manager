@@ -379,10 +379,16 @@ def generate_reports(task_list, username_password):
     number_of_overdue_tasks = len(overdue_tasks)    
 
     # Getting the percentage of incomplete tasks.
-    percentage_of_uncompleted_tasks = (number_of_uncompleted_tasks/number_of_tasks) * 100
+    if number_of_tasks > 0:
+        percentage_of_uncompleted_tasks = (number_of_uncompleted_tasks/number_of_tasks) * 100
+    else:
+        percentage_of_uncompleted_tasks = 0
 
     # Getting the percentage of overdue, incomplete tasks.
-    percentage_of_overdue_tasks = (number_of_overdue_tasks/number_of_tasks) * 100
+    if number_of_tasks > 0:    
+        percentage_of_overdue_tasks = (number_of_overdue_tasks/number_of_tasks) * 100
+    else:
+        percentage_of_overdue_tasks = 0
 
     # Writing the data into a text file.
     with open("task_overview.txt", "w") as task_file:
@@ -421,7 +427,12 @@ Tasks registered: {number_of_tasks}\n"""
     # Getting all the information from the dictionary.
     for user, num in user_tasks.items():
         all_users_tasks += f"\nUser {user} tasks assigned: {len(num)}"
-        user_task_percentage = (len(num)/number_of_tasks) * 100
+        
+        if number_of_tasks > 0:    
+            user_task_percentage = (len(num)/number_of_tasks) * 100
+        else:
+            user_task_percentage = 0
+
         all_users_tasks += f"""\n{user_task_percentage}% of total tasks assigned to this user"""
         comp_tasks = []
         uncomp_tasks = []
@@ -430,16 +441,31 @@ Tasks registered: {number_of_tasks}\n"""
                 comp_tasks.append(d)
             elif d['completed'] == False:
                 uncomp_tasks.append(d)
-        completed_percentage = (len(comp_tasks)/len(num)) * 100
+        
+        if len(num) > 0:
+            completed_percentage = (len(comp_tasks)/len(num)) * 100
+        else:
+            completed_percentage = 0
+
         all_users_tasks += f"""\n{completed_percentage}% of this user's tasks are completed"""
-        uncompleted_percentage = (len(uncomp_tasks)/len(num)) * 100
+        
+        if len(num) > 0:
+            uncompleted_percentage = (len(uncomp_tasks)/len(num)) * 100
+        else:
+            uncompleted_percentage = 0
+
         all_users_tasks += f"""\n{uncompleted_percentage}% of this user's tasks are not completed"""
         current_date = datetime.now()
         over_tasks = []
         for d in num:
             if d['due_date'] < current_date and d['completed'] is False:
                 over_tasks.append(d)
-        overdue_uncomp_percentage = (len(over_tasks)/len(num)) * 100
+        
+        if len(num) > 0:
+            overdue_uncomp_percentage = (len(over_tasks)/len(num)) * 100
+        else:
+            overdue_uncomp_percentage = 0
+
         all_users_tasks += f"""\n{overdue_uncomp_percentage}% of this user's tasks are incompleted and are overdue\n"""
 
     # Writing the user data into a text file.
